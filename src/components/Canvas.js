@@ -1,17 +1,17 @@
 import p5 from "p5";
 import React, { useEffect, useRef, useState } from "react"
-import { Button, Col, Form, ListGroup, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, ListGroup, Row } from "react-bootstrap";
 import MathJax from "react-mathjax";
+import { GraphType, N } from "../helpers/consts";
 import { sketch } from "../helpers/fourier";
-import { summation } from "../helpers/latexFormulas";
+import { getFunctionFormula, getSummationFormula } from "../helpers/latexFormulas";
 import { templates } from "../helpers/templates";
 import { Instructions } from "./Instructions";
 
 const initialState = {
     n: 8,
     speed: 7,
-    A: '(-1) ^ (n+1) / n',
-    coeff: 'n * PI'
+    equation: templates[0]
 };
 
 export const Canvas = () => {
@@ -22,10 +22,9 @@ export const Canvas = () => {
     const invokeP5 = () => {
         myP5.current = new p5(sketch(
             parseInt(state.n),
-            parseFloat(state.speed), {
-                A: state.A,
-                coeff: state.coeff
-            }), canvasRef.current);
+            parseFloat(state.speed),
+            state.equation
+        ), canvasRef.current);
     };
 
     const cleanUpP5 = () => {
@@ -45,11 +44,20 @@ export const Canvas = () => {
         });
     };
 
+    const onEquationChange = (key) => (e) => {
+        setState({
+            ...state,
+            equation: {
+                ...state.equation,
+                [key]: e.target.value
+            }
+        });
+    };
+
     const setTemplate = (template) => {
         setState({
             ...state,
-            A: template.A,
-            coeff: template.coeff
+            equation: template
         });
     };
 
@@ -65,22 +73,62 @@ export const Canvas = () => {
             <div className="side-bar">
                 <Instructions/>
                 <Form onSubmit={onSubmit}>
-                    <h4>Equation</h4>
-                    <Form.Group className="d-flex align-items-center">
-                        <MathJax.Node formula={summation}/>
-                        <Form.Control
-                            className="mx-2"
-                            value={state.A}
-                            onChange={onChange('A')}
-                        />
-                        <MathJax.Node inline formula={'sin('}/>
-                        <Form.Control
-                            className="mx-2"
-                            value={state.coeff}
-                            onChange={onChange('coeff')}
-                        />
-                        <MathJax.Node inline formula={'x)'}/>
+                    <Form.Group>
+                        <h4>Equation</h4>
+                        <div className="d-flex align-items-center">
+                            <MathJax.Node formula={getSummationFormula(state.equation.nType)}/>
+                            <Form.Control
+                                className="mx-2"
+                                value={state.equation.A}
+                                onChange={onEquationChange('A')}
+                            />
+                            <MathJax.Node inline formula={getFunctionFormula(state.equation.graphType)}/>
+                            <Form.Control
+                                className="mx-2"
+                                value={state.equation.coeff}
+                                onChange={onEquationChange('coeff')}
+                            />
+                            <MathJax.Node inline formula={'x)'}/>
+                        </div>
                     </Form.Group>
+                    <Container className="p-0">
+                        <Row>
+                            <Col md={6}>
+                                <h4>n</h4>
+                                <div>
+                                    {
+                                        Object.entries(N).map(([type, label]) => (
+                                            <Form.Check
+                                                name="nGroup"
+                                                type="radio"
+                                                label={label}
+                                                value={label}
+                                                checked={state.equation.nType === label}
+                                                onChange={onEquationChange('nType')}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <h4>Graph type</h4>
+                                <div>
+                                    {
+                                        Object.entries(GraphType).map(([type, label]) => (
+                                            <Form.Check
+                                                name="graphTypeGroup"
+                                                type="radio"
+                                                label={label}
+                                                value={label}
+                                                checked={state.equation.graphType === label}
+                                                onChange={onEquationChange('graphType')}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                            </Col>
+                        </Row>
+                    </Container>
                     <div>
                         <h4>Templates</h4>
                         <ListGroup>
@@ -89,6 +137,7 @@ export const Canvas = () => {
                                     <ListGroup.Item
                                         action
                                         onClick={() => setTemplate(template)}
+                                        active={state.equation === template}
                                     >
                                         {template.name}
                                     </ListGroup.Item>
@@ -113,9 +162,6 @@ export const Canvas = () => {
                                 onChange={onChange('n')}
                             />
                         </Col>
-                    </Form.Group>
-                    <Form.Group>
-
                     </Form.Group>
                     <Form.Group as={Row}>
                         <Form.Label column sm="12">speed</Form.Label>

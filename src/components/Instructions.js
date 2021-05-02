@@ -16,8 +16,7 @@ const instructions = [
 ]
 export const Instructions = () => (
     <div>
-        <h4>Instructions</h4>
-        <span>Examples of the inputs</span>
+        <h4>Input examples</h4>
         <div>
             {
                 instructions.map((item) => (

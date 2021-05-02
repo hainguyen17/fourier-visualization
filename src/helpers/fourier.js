@@ -1,4 +1,26 @@
 import {Parser} from 'expr-eval';
+import { GraphType, N } from './consts';
+
+const xyGraphMap = {
+    [GraphType.COSINE]: {
+        xFunc: Math.sin,
+        yFunc: Math.cos
+    },
+    [GraphType.SINE]: {
+        xFunc: Math.cos,
+        yFunc: Math.sin
+    }
+};
+
+const getNValue = (n, nType) => {
+    const nMap = {
+        [N.ALL]: n,
+        [N.ODD]: 2 * n - 1,
+        [N.EVEN]: 2 * n,
+    };
+
+    return nMap[nType]
+};
 
 export const sketch = (n, speed, inputs) => (p) => {
     let time = 0;
@@ -23,17 +45,21 @@ export const sketch = (n, speed, inputs) => (p) => {
             const prevY = y;
             
             const A = Parser.evaluate(inputs.A, {
-                n: i
+                n: getNValue(i, inputs.nType)
             });
 
             const coeff = Parser.evaluate(inputs.coeff, {
-                n: i
+                n: getNValue(i, inputs.nType)
             });
 
-            console.log(A, coeff)
+            const {
+                xFunc,
+                yFunc
+            } = xyGraphMap[inputs.graphType];
 
-            x += A * radius * Math.cos(coeff * time);
-            y += A * radius * Math.sin(coeff * time);
+
+            x -= A * radius * xFunc(coeff * time);
+            y -= A * radius * yFunc(coeff * time);
 
             p.stroke(255);
             p.noFill();
