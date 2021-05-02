@@ -6,12 +6,12 @@ export const templates = [
     },
     {
         name: 'sawtooth wave',
-        A: '-(1 / 2 - 1 / PI) / n',
+        A: '-1 / n',
         coeff: 'n * PI'
     },
     {
         name: 'triangle wave',
-        A: '4 * (1 - (-1) ^ (2 * n - 1)) / (PI * (2 * n - 1)) ^ 2',
+        A: '8 * ((-1) ^ ((2 * n - 2) / 2)) / ((PI * (2 * n - 1)) ^ 2)',
         coeff: '(2 * n - 1) * PI'
     }
 ]
