@@ -32,7 +32,7 @@ export const sketch = (n, speed, inputs) => (p) => {
     };
 
     p.draw = () => {
-        p.background(0);
+        p.background('#eee');
         p.translate(300, 300);
 
         let x = 0,
@@ -61,13 +61,15 @@ export const sketch = (n, speed, inputs) => (p) => {
             x -= A * radius * xFunc(coeff * time);
             y -= A * radius * yFunc(coeff * time);
 
-            p.stroke(255);
+            p.stroke('#17a2b8');
             p.noFill();
+            p.strokeWeight(1);
             p.ellipse(prevX, prevY, A * radius * 2);
 
 
             p.fill(255);
-            p.stroke(255);
+            p.strokeWeight(2);
+            p.stroke('#17a2b8');
             p.line(prevX, prevY, x, y)
             p.ellipse(x, y, 2);
         }
@@ -78,6 +80,7 @@ export const sketch = (n, speed, inputs) => (p) => {
 
         p.beginShape();
         p.noFill();
+        p.strokeWeight(2);
 
         wave.forEach((point, index) => p.vertex(index, point));
         p.endShape();
