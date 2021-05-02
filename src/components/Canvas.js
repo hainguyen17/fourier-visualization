@@ -1,9 +1,9 @@
 import p5 from "p5";
 import React, { useEffect, useRef, useState } from "react"
-import { Button, Col, Container, Form, ListGroup, Row } from "react-bootstrap";
+import { Alert, Button, Col, Container, Form, ListGroup, Row } from "react-bootstrap";
 import MathJax from "react-mathjax";
 import { GraphType, N } from "../helpers/consts";
-import { sketch } from "../helpers/fourier";
+import { sketch, verifyInput } from "../helpers/fourier";
 import { getFunctionFormula, getSummationFormula } from "../helpers/latexFormulas";
 import { templates } from "../helpers/templates";
 import { Instructions } from "./Instructions";
@@ -18,6 +18,7 @@ export const Canvas = () => {
     const canvasRef = useRef(null);
     const myP5 = useRef(null);
     const [state, setState] = useState(initialState);
+    const [hasError, setHasError] = useState(false);
 
     const invokeP5 = () => {
         myP5.current = new p5(sketch(
@@ -64,13 +65,29 @@ export const Canvas = () => {
     const onSubmit = (e) => {
         e.preventDefault();
 
-        cleanUpP5();
-        invokeP5();
+        try {
+            verifyInput(state.equation);
+            cleanUpP5();
+            invokeP5();
+            setHasError(false);
+        } catch (e) {
+            setHasError(true);
+        }
     };
 
     return (
         <div className="wrapper">
             <div className="side-bar">
+                {
+                    hasError &&
+                        <Alert
+                            onClose={() => setHasError(false)}
+                            dismissible
+                            variant="danger"
+                        >
+                            Something is wrong with your inputs...
+                        </Alert>
+                }
                 <Instructions/>
                 <Form onSubmit={onSubmit}>
                     <Form.Group>
@@ -149,8 +166,10 @@ export const Canvas = () => {
                         <Form.Label column sm="12">n</Form.Label>
                         <Col sm="4">
                             <Form.Control
+                                type="number"
                                 value={state.n}
                                 onChange={onChange('n')}
+                                required
                             />
                         </Col>
                         <Col sm="8">
@@ -167,8 +186,10 @@ export const Canvas = () => {
                         <Form.Label column sm="12">speed</Form.Label>
                         <Col sm="4">
                             <Form.Control 
+                                type="number"
                                 value={state.speed}
                                 onChange={onChange('speed')}
+                                required
                             />
                         </Col>
                         <Col sm="8">

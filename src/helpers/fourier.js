@@ -22,6 +22,15 @@ const getNValue = (n, nType) => {
     return nMap[nType]
 };
 
+export const verifyInput = (inputs) => {
+    Parser.evaluate(inputs.A, {
+        n: 0
+    });
+    Parser.evaluate(inputs.coeff, {
+        n: 0
+    });
+}
+
 export const sketch = (n, speed, inputs) => (p) => {
     let time = 0;
     let wave = [];
